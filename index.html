@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lubona ❤️</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#000;overflow:hidden}
+canvas{display:block;width:100vw;height:100dvh}
+</style>
+</head>
+<body>
+<canvas id="canvas"></canvas>
+<script>
+const canvas=document.getElementById("canvas");
+const ctx=canvas.getContext("2d");
+let W,H,particles=[],texts=[];
+const random=(a,b)=>Math.random()*(b-a)+a;
+
+function init(){
+ W=innerWidth;H=innerHeight;
+ let dpr=Math.min(devicePixelRatio||1,2);
+ canvas.width=W*dpr;
+ canvas.height=H*dpr;
+ ctx.setTransform(dpr,0,0,dpr,0,0);
+ particles=[];texts=[];
+
+ let scale=Math.min(W*.038,H*.018,14);
+
+ for(let i=0;i<850;i++){
+  let t=random(0,Math.PI*2);
+  let x=16*Math.pow(Math.sin(t),3);
+  let y=13*Math.cos(t)-5*Math.cos(2*t)
+       -2*Math.cos(3*t)-Math.cos(4*t);
+  particles.push({
+   x:x*scale+random(-8,8),
+   y:-y*scale+random(-8,8),
+   size:random(2,5),
+   phase:random(0,7),
+   speed:random(.5,2)
+  });
+ }
+
+ for(let i=0;i<75;i++){
+  texts.push({
+   x:random(-W*.2,W),
+   y:random(H*.15,H*.85),
+   size:random(8,17),
+   speed:random(.15,.6),
+   phase:random(0,7)
+  });
+ }
+}
+
+function animate(ms){
+ let time=ms/1000;
+ ctx.fillStyle="#000";
+ ctx.fillRect(0,0,W,H);
+
+ texts.forEach(p=>{
+  let y=(p.y-time*p.speed*15+H)%H;
+  ctx.globalAlpha=.35+.6*
+   Math.abs(Math.sin(time*.7+p.phase));
+  ctx.font=p.size+"px Arial";
+  ctx.fillStyle="#ff8aaf";
+  ctx.fillText("❤️ I Love You ❤️",p.x,y);
+ });
+ ctx.globalAlpha=1;
+
+ let beat=1+.045*Math.sin(time*7)
+           +.025*Math.sin(time*14);
+
+ ctx.save();
+ ctx.translate(W/2,H/2);
+ ctx.scale(beat,beat);
+
+ particles.forEach(p=>{
+  let x=p.x+Math.sin(time*p.speed+p.phase)*2;
+  let y=p.y+Math.cos(time*p.speed+p.phase)*2;
+  ctx.globalAlpha=.5+.5*
+   Math.abs(Math.sin(time*2+p.phase));
+  ctx.shadowColor="#ff1493";
+  ctx.shadowBlur=12;
+  ctx.fillStyle="#ff2999";
+  ctx.font=(p.size*2+4)+"px Arial";
+  ctx.fillText("♥",x,y);
+ });
+ ctx.restore();
+
+ ctx.globalAlpha=1;
+ ctx.shadowBlur=0;
+
+ let fs=Math.min(W*.12,48);
+ ctx.textAlign="center";
+ ctx.textBaseline="middle";
+ ctx.font="italic bold "+fs+"px cursive";
+ ctx.shadowColor="#ff0066";
+ ctx.shadowBlur=22;
+ ctx.fillStyle="#fff4f8";
+ ctx.fillText("Lubona",W/2,H/2);
+
+ ctx.font="30px Arial";
+ ctx.fillStyle="#ff3388";
+ ctx.fillText("♡",W/2,H/2+45);
+
+ ctx.shadowBlur=0;
+ ctx.textAlign="start";
+ requestAnimationFrame(animate);
+}
+
+addEventListener("resize",init);
+init();
+requestAnimationFrame(animate);
+</script>
+</body>
+</html>
